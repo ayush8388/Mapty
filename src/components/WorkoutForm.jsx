@@ -40,7 +40,7 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
       onSubmit={handleSubmit}
       className="bg-gray-700 rounded p-4 grid grid-cols-2 gap-3 text-sm"
     >
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <label className="w-1/2">Type</label>
         <select
           value={type}
@@ -52,7 +52,7 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
         </select>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <label className="w-1/2">Distance</label>
         <input
           type="number"
@@ -63,7 +63,7 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
         />
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <label className="w-1/2">Duration</label>
         <input
           type="number"
@@ -75,7 +75,7 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
       </div>
 
       {type === "running" && (
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <label className="w-1/2">Cadence</label>
           <input
             type="number"
@@ -88,14 +88,14 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
       )}
 
       {type === "cycling" && (
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <label className="w-1/2">Elevation</label>
           <input
             type="number"
             placeholder="m"
             value={elevation}
             onChange={e => setElevation(e.target.value)}
-            className="w-full p-1 rounded text-black bg-slate-200 "
+            className="w-full p-1 rounded text-black bg-slate-200"
           />
         </div>
       )}
