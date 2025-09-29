@@ -45,7 +45,7 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
         <select
           value={type}
           onChange={e => setType(e.target.value)}
-          className="w-full p-1 rounded text-black"
+          className="w-full p-1 rounded text-black bg-slate-200 "
         >
           <option value="running">Running</option>
           <option value="cycling">Cycling</option>
@@ -59,7 +59,7 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
           placeholder="km"
           value={distance}
           onChange={e => setDistance(e.target.value)}
-          className="w-full p-1 rounded text-black"
+          className="w-full p-1 rounded text-black bg-slate-200 "
         />
       </div>
 
@@ -70,7 +70,7 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
           placeholder="min"
           value={duration}
           onChange={e => setDuration(e.target.value)}
-          className="w-full p-1 rounded text-black"
+          className="w-full p-1 rounded text-black bg-slate-200 "
         />
       </div>
 
@@ -82,7 +82,7 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
             placeholder="spm"
             value={cadence}
             onChange={e => setCadence(e.target.value)}
-            className="w-full p-1 rounded text-black"
+            className="w-full p-1 rounded text-black bg-slate-200 "
           />
         </div>
       )}
@@ -95,7 +95,7 @@ export default function WorkoutForm({ coords, onAdd, onCancel }) {
             placeholder="m"
             value={elevation}
             onChange={e => setElevation(e.target.value)}
-            className="w-full p-1 rounded text-black"
+            className="w-full p-1 rounded text-black bg-slate-200 "
           />
         </div>
       )}

@@ -1,6 +1,6 @@
 export default function Sidebar({ children, workouts, onReset }) {
   return (
-    <div className="w-[350px] bg-gray-800 text-white p-5 flex flex-col">
+    <div className="w-[500px] bg-gray-800 text-white p-12 flex flex-col">
       <img src="/logo.png" alt="Logo" className="h-12 mx-auto mb-6" />
 
       {workouts.length >= 2 && (
