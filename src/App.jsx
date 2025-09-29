@@ -1,17 +1,39 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import Sidebar from "./components/Sidebar";
 import WorkoutForm from "./components/WorkoutForm";
 import WorkoutItem from "./components/WorkoutItem";
+
+
+function ChangeView({ center, zoom }) {
+  const map = useMap();
+  useEffect(() => {
+    if (center && center.length === 2) {
+      map.flyTo(center, zoom, {
+        animate: true,
+        duration: 1.5 
+      });
+    }
+  }, [center, zoom, map]);
+  return null;
+}
+
+function MapClick({ onClick }) {
+  useMapEvents({
+    click(e) {
+      onClick([e.latlng.lat, e.latlng.lng]);
+    },
+  });
+  return null;
+}
 
 function App() {
   const [workouts, setWorkouts] = useState([]);
   const [mapPosition, setMapPosition] = useState([51.505, -0.09]);
   const [mapEvent, setMapEvent] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [hasLocation, setHasLocation] = useState(false);
-
+  const [liveLocation, setLiveLocation] = useState(null); 
 
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("workouts"));
@@ -22,30 +44,39 @@ function App() {
     localStorage.setItem("workouts", JSON.stringify(workouts));
   }, [workouts]);
 
-
   useEffect(() => {
-  if (navigator.geolocation) {
+    if (!navigator.geolocation) {
+      console.error("Geolocation is not supported by your browser.");
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        setMapPosition([latitude, longitude]); 
-        setHasLocation(true);
+        setMapPosition([latitude, longitude]);
+        setLiveLocation([latitude, longitude]);
       },
-      () => {
-        alert("Could not get your location 😢");
-      }
+      { enableHighAccuracy: true }
     );
-  }
-}, []);
 
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setLiveLocation([latitude, longitude]);
+      },
+      { enableHighAccuracy: true }
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, []);
 
   function handleNewWorkout(workout) {
-    setWorkouts([...workouts, workout]);
+    setWorkouts((prev) => [...prev, workout]);
     setShowForm(false);
   }
 
   function handleDeleteWorkout(id) {
-    setWorkouts(workouts.filter(w => w.id !== id));
+    setWorkouts((prev) => prev.filter((w) => w.id !== id));
   }
 
   function handleReset() {
@@ -55,11 +86,7 @@ function App() {
 
   return (
     <div className="flex h-screen">
-      <Sidebar
-        workouts={workouts}
-        onDelete={handleDeleteWorkout}
-        onReset={handleReset}
-      >
+      <Sidebar workouts={workouts} onDelete={handleDeleteWorkout} onReset={handleReset}>
         {showForm && (
           <WorkoutForm
             coords={mapEvent}
@@ -67,13 +94,13 @@ function App() {
             onCancel={() => setShowForm(false)}
           />
         )}
-        {workouts.map(w => (
+        {workouts.map((w) => (
           <WorkoutItem key={w.id} workout={w} onDelete={handleDeleteWorkout} />
         ))}
       </Sidebar>
 
       <MapContainer
-        center={mapPosition}
+        center={mapPosition} 
         zoom={15}
         className="flex-1"
         style={{ height: "100%", width: "100%" }}
@@ -82,19 +109,23 @@ function App() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
-         {hasLocation && (
-            <Marker position={mapPosition}>
-              <Popup>You are here 🚀</Popup>
-            </Marker>
-          )}
+
+        <ChangeView center={mapPosition} zoom={15} />
 
         <MapClick
-          onClick={coords => {
+          onClick={(coords) => {
             setMapEvent(coords);
             setShowForm(true);
           }}
         />
-        {workouts.map(w => (
+
+        {liveLocation && (
+          <Marker position={liveLocation}>
+            <Popup>📍 You are here</Popup>
+          </Marker>
+        )}
+
+        {workouts.map((w) => (
           <Marker key={w.id} position={w.coords}>
             <Popup>
               {w.type === "running" ? "🏃‍♂️" : "🚴‍♀️"} {w.description}
@@ -104,15 +135,6 @@ function App() {
       </MapContainer>
     </div>
   );
-}
-
-function MapClick({ onClick }) {
-  useMapEvents({
-    click(e) {
-      onClick([e.latlng.lat, e.latlng.lng]);
-    },
-  });
-  return null;
 }
 
 export default App;
