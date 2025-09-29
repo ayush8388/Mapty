@@ -44,29 +44,44 @@ function App() {
     localStorage.setItem("workouts", JSON.stringify(workouts));
   }, [workouts]);
 
+  // 3. Get current position and watch location changes
   useEffect(() => {
     if (!navigator.geolocation) {
       console.error("Geolocation is not supported by your browser.");
       return;
     }
 
+    // Define a clear error handler for watchPosition outside the call
+    const watchError = (err) => {
+      console.error("Error watching location:", err);
+    };
+
+    // 1. getCurrentPosition (Runs once)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
         setMapPosition([latitude, longitude]);
         setLiveLocation([latitude, longitude]);
       },
+      (err) => {
+        // Use a simple, non-conditional arrow function here
+        console.error(`Geolocation Error (${err.code}): ${err.message || "Please ensure permissions are granted."}`);
+      },
       { enableHighAccuracy: true }
     );
 
+    // 2. watchPosition (Runs continuously)
+    // Pass the named function to avoid potential minification/build issues
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
         setLiveLocation([latitude, longitude]);
       },
+      watchError, // Use the named function reference here
       { enableHighAccuracy: true }
     );
 
+    // Cleanup function
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
