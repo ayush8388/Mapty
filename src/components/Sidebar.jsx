@@ -1,6 +1,6 @@
 export default function Sidebar({ children, workouts, onReset }) {
   return (
-    <div className="w-[500px] bg-gray-800 text-white p-12 flex flex-col">
+    <div className="w-[500px] bg-gray-800 text-white p-10 flex flex-col">
       <img src="/logo.png" alt="Logo" className="h-12 mx-auto mb-6" />
 
       {workouts.length >= 2 && (
@@ -14,7 +14,7 @@ export default function Sidebar({ children, workouts, onReset }) {
         </div>
       )}
 
-      <ul className="flex-1 overflow-y-auto space-y-3">{children}</ul>
+      <ul className="flex-1 overflow-y-auto space-y-3 scrollbar-hide pb-10">{children}</ul>
 
     </div>
   );
