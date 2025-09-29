@@ -4,7 +4,18 @@ import "leaflet/dist/leaflet.css";
 import Sidebar from "./components/Sidebar";
 import WorkoutForm from "./components/WorkoutForm";
 import WorkoutItem from "./components/WorkoutItem";
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
+L.Marker.prototype.options.icon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 function ChangeView({ center, zoom }) {
   const map = useMap();
@@ -44,19 +55,16 @@ function App() {
     localStorage.setItem("workouts", JSON.stringify(workouts));
   }, [workouts]);
 
-  // 3. Get current position and watch location changes
   useEffect(() => {
     if (!navigator.geolocation) {
       console.error("Geolocation is not supported by your browser.");
       return;
     }
 
-    // Define a clear error handler for watchPosition outside the call
     const watchError = (err) => {
       console.error("Error watching location:", err);
     };
 
-    // 1. getCurrentPosition (Runs once)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
@@ -64,24 +72,19 @@ function App() {
         setLiveLocation([latitude, longitude]);
       },
       (err) => {
-        // Use a simple, non-conditional arrow function here
         console.error(`Geolocation Error (${err.code}): ${err.message || "Please ensure permissions are granted."}`);
       },
       { enableHighAccuracy: true }
     );
-
-    // 2. watchPosition (Runs continuously)
-    // Pass the named function to avoid potential minification/build issues
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
         setLiveLocation([latitude, longitude]);
       },
-      watchError, // Use the named function reference here
+      watchError, 
       { enableHighAccuracy: true }
     );
 
-    // Cleanup function
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
